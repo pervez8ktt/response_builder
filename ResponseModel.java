@@ -1,5 +1,3 @@
-package com.forum.responsemodels;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -47,7 +45,7 @@ public class ResponseModel<T> {
 	
 	private static Gson getGsonObject() {
 
-		Gson gson = new GsonBuilder().serializeNulls().disableHtmlEscaping().addSerializationExclusionStrategy(new ExclusionStrategy() {
+		Gson gson = new GsonBuilder().registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY).serializeNulls().disableHtmlEscaping().addSerializationExclusionStrategy(new ExclusionStrategy() {
 
 			@Override
 			public boolean shouldSkipField(FieldAttributes f) {
@@ -81,7 +79,7 @@ public class ResponseModel<T> {
 	
 	private static Gson getGsonObjectUserInfoGet() {
 
-		Gson gson = new GsonBuilder().serializeNulls().disableHtmlEscaping().addSerializationExclusionStrategy(new ExclusionStrategy() {
+		Gson gson = new GsonBuilder().registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY).serializeNulls().disableHtmlEscaping().addSerializationExclusionStrategy(new ExclusionStrategy() {
 
 			@Override
 			public boolean shouldSkipField(FieldAttributes f) {
@@ -118,7 +116,7 @@ public class ResponseModel<T> {
 	
 	private static Gson getGsonObjectFcmGet() {
 
-		Gson gson = new GsonBuilder().serializeNulls().disableHtmlEscaping().addSerializationExclusionStrategy(new ExclusionStrategy() {
+		Gson gson = new GsonBuilder().registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY).serializeNulls().disableHtmlEscaping().addSerializationExclusionStrategy(new ExclusionStrategy() {
 
 			@Override
 			public boolean shouldSkipField(FieldAttributes f) {
@@ -155,7 +153,7 @@ public class ResponseModel<T> {
 	
 	private static Gson getGsonObjectAdminAndUserInfoGet() {
 
-		Gson gson = new GsonBuilder().serializeNulls().disableHtmlEscaping().addSerializationExclusionStrategy(new ExclusionStrategy() {
+		Gson gson = new GsonBuilder().registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY).serializeNulls().disableHtmlEscaping().addSerializationExclusionStrategy(new ExclusionStrategy() {
 
 			@Override
 			public boolean shouldSkipField(FieldAttributes f) {
