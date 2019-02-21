@@ -11,253 +11,319 @@ import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class ResponseModel<T> {
+public class ResponseModel {
 
-	private Status status;
 	
-	private T data;
-	
-	private String message;
-	
-	public Status getStatus() {
-		return status;
+
+	public static <T> String getResponse(Status status, T t, ResponseMessage message, Integer currentUserId) {
+
+		if(message == null) {
+			message = ResponseMessage.DEFAULT;
+		}
+		
+		return getResponse(status, t, message.message, currentUserId, Roles.ROLE_ANONYMOUS);
+
 	}
 
-	public T getData() {
-		return data;
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	private ResponseModel(Status status, T data, String message) {
-		super();
-		this.status = status;
-		this.data = data;
-		this.message = message;
+	public static <T> String getResponse(Status status, T t, ResponseMessage message) {
+		//ResponseModel<T> responseModel = new ResponseModel<T>(status, t, message.message, null);
+		//return getGsonObject().toJson(responseModel);
+		
+		if(message == null) {
+			message = ResponseMessage.DEFAULT;
+		}
+		
+		return getResponse(status, t, message.message, null, Roles.ROLE_ANONYMOUS);
 		
 	}
 	
-	private ResponseModel() {
-		// TODO Auto-generated constructor stub
+	public static String getResponse(Status status, String message) {
+
+		
+		return getResponse(status, null, message, null, Roles.ROLE_ANONYMOUS);
+		
 	}
 	
-	private static Gson getGsonObject() {
+	
 
-		Gson gson = new GsonBuilder().registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY).serializeNulls().disableHtmlEscaping().addSerializationExclusionStrategy(new ExclusionStrategy() {
+	
+	public static  <T> String  getResponse(Status status, ResponseMessage responseMessage) {
+		
+		return getResponse(status, null,responseMessage);
+		
+	}
+	
+	
+	public static <T> String getResponse(Status status, T t, ResponseMessage message, Roles roles) {
+		// TODO Auto-generated method stub
+		
+		if(message == null) {
+			message = ResponseMessage.DEFAULT;
+		}
+		
+		return getResponse(status, t, message.message, null, roles);
+	}
+	
+	public static  <T> String  getResponse(Status status, T t , String message, Integer currentUserId,Roles roles) {
+		
+		ResponseModel rm = new ResponseModel();
+		
+		Model<T> responseModel = rm.new Model<T>(status, t, message,null);
+		
+		switch (roles) {
+		case ROLE_ADMIN:
+			
+			return getGsonObjectAdminAndUserInfoGet().toJson(responseModel);
 
-			@Override
-			public boolean shouldSkipField(FieldAttributes f) {
-				//
+		case ROLE_USER:
+			return getGsonObjectUserInfoGet().toJson(responseModel);
+		default:
+			return getGsonObject().toJson(responseModel);
+		}
+		
+		
+	}
 
-				if (f.getAnnotation(GetIt.class) != null) {
-					return false;
-				} else if (f.getAnnotation(OneToMany.class) != null) {
-					return true;
-				}else if (f.getAnnotation(ManyToMany.class) != null) {
-					return true;
-				} 
-				else if (f.getAnnotation(SkipIt.class) != null) {
-					return true;
-				}
+	public static Gson getGsonObject() {
+
+		Gson gson = new GsonBuilder().registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY).serializeNulls()
+				.disableHtmlEscaping().addSerializationExclusionStrategy(new ExclusionStrategy() {
+
+					@Override
+					public boolean shouldSkipField(FieldAttributes f) {
+						//
+
+						if (f.getAnnotation(GetIt.class) != null) {
+							return false;
+						} else if (f.getAnnotation(OneToMany.class) != null) {
+							return true;
+						} else if (f.getAnnotation(ManyToMany.class) != null) {
+							return true;
+						} else if (f.getAnnotation(SkipIt.class) != null) {
+							return true;
+						}
 
 				else {
-					return false;
-				}
-			}
+							return false;
+						}
+					}
 
-			@Override
-			public boolean shouldSkipClass(Class<?> arg0) {
-				// TODO Auto-generated method stub
-				return false;
-			}
-		}).create();
+					@Override
+					public boolean shouldSkipClass(Class<?> arg0) {
+						// TODO Auto-generated method stub
+						return false;
+					}
+				}).create();
 
 		return gson;
 	}
-	
+
 	private static Gson getGsonObjectUserInfoGet() {
 
-		Gson gson = new GsonBuilder().registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY).serializeNulls().disableHtmlEscaping().addSerializationExclusionStrategy(new ExclusionStrategy() {
+		Gson gson = new GsonBuilder().registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY).serializeNulls()
+				.disableHtmlEscaping().addSerializationExclusionStrategy(new ExclusionStrategy() {
 
-			@Override
-			public boolean shouldSkipField(FieldAttributes f) {
-				//
+					@Override
+					public boolean shouldSkipField(FieldAttributes f) {
+						//
 
-				if (f.getAnnotation(GetIt.class) != null) {
-					return false;
-				} else if (f.getAnnotation(OneToMany.class) != null) {
-					return true;
-				}else if (f.getAnnotation(ManyToMany.class) != null) {
-					return true;
-				}
-				else if (f.getAnnotation(UserInfoGet.class) != null) {
-					return false;
-				} 
-				else if (f.getAnnotation(SkipIt.class) != null) {
-					return true;
-				}
+						if (f.getAnnotation(GetIt.class) != null) {
+							return false;
+						} else if (f.getAnnotation(OneToMany.class) != null) {
+							return true;
+						} else if (f.getAnnotation(ManyToMany.class) != null) {
+							return true;
+						} else if (f.getAnnotation(UserInfoGet.class) != null) {
+							return false;
+						} else if (f.getAnnotation(SkipIt.class) != null) {
+							return true;
+						}
 
 				else {
-					return false;
-				}
-			}
+							return false;
+						}
+					}
 
-			@Override
-			public boolean shouldSkipClass(Class<?> arg0) {
-				// TODO Auto-generated method stub
-				return false;
-			}
-		}).create();
+					@Override
+					public boolean shouldSkipClass(Class<?> arg0) {
+						// TODO Auto-generated method stub
+						return false;
+					}
+				}).create();
 
 		return gson;
 	}
-	
+
 	private static Gson getGsonObjectFcmGet() {
 
-		Gson gson = new GsonBuilder().registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY).serializeNulls().disableHtmlEscaping().addSerializationExclusionStrategy(new ExclusionStrategy() {
+		Gson gson = new GsonBuilder().registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY).serializeNulls()
+				.disableHtmlEscaping().addSerializationExclusionStrategy(new ExclusionStrategy() {
 
-			@Override
-			public boolean shouldSkipField(FieldAttributes f) {
-				//
+					@Override
+					public boolean shouldSkipField(FieldAttributes f) {
+						//
 
-				if (f.getAnnotation(GetIt.class) != null) {
-					return false;
-				} else if (f.getAnnotation(OneToMany.class) != null) {
-					return true;
-				}else if (f.getAnnotation(ManyToMany.class) != null) {
-					return true;
-				}
-				else if (f.getAnnotation(FcmGet.class) != null) {
-					return false;
-				} 
-				else if (f.getAnnotation(SkipIt.class) != null) {
-					return true;
-				}
+						if (f.getAnnotation(GetIt.class) != null) {
+							return false;
+						} else if (f.getAnnotation(OneToMany.class) != null) {
+							return true;
+						} else if (f.getAnnotation(ManyToMany.class) != null) {
+							return true;
+						} else if (f.getAnnotation(FcmGet.class) != null) {
+							return false;
+						} else if (f.getAnnotation(SkipIt.class) != null) {
+							return true;
+						}
 
 				else {
-					return false;
-				}
-			}
+							return false;
+						}
+					}
 
-			@Override
-			public boolean shouldSkipClass(Class<?> arg0) {
-				// TODO Auto-generated method stub
-				return false;
-			}
-		}).create();
+					@Override
+					public boolean shouldSkipClass(Class<?> arg0) {
+						// TODO Auto-generated method stub
+						return false;
+					}
+				}).create();
 
 		return gson;
 	}
-	
+
 	private static Gson getGsonObjectAdminAndUserInfoGet() {
 
-		Gson gson = new GsonBuilder().registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY).serializeNulls().disableHtmlEscaping().addSerializationExclusionStrategy(new ExclusionStrategy() {
+		Gson gson = new GsonBuilder().registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY).serializeNulls()
+				.disableHtmlEscaping().addSerializationExclusionStrategy(new ExclusionStrategy() {
 
-			@Override
-			public boolean shouldSkipField(FieldAttributes f) {
-				//
+					@Override
+					public boolean shouldSkipField(FieldAttributes f) {
+						//
 
-				if (f.getAnnotation(AdminSkip.class) != null) {
-					return true;
-				}
-				else if (f.getAnnotation(GetIt.class) != null) {
-					return false;
-				} else if (f.getAnnotation(OneToMany.class) != null) {
-					return true;
-				}else if (f.getAnnotation(ManyToMany.class) != null) {
-					return true;
-				}
-				else if (f.getAnnotation(UserInfoGet.class) != null) {
-					return false;
-				}else if (f.getAnnotation(AdminGet.class) != null) {
-					return false;
-				} 
-				else if (f.getAnnotation(SkipIt.class) != null) {
-					return true;
-				}
+						if (f.getAnnotation(AdminSkip.class) != null) {
+							return true;
+						} else if (f.getAnnotation(GetIt.class) != null) {
+							return false;
+						} else if (f.getAnnotation(OneToMany.class) != null) {
+							return true;
+						} else if (f.getAnnotation(ManyToMany.class) != null) {
+							return true;
+						} else if (f.getAnnotation(UserInfoGet.class) != null) {
+							return false;
+						} else if (f.getAnnotation(AdminGet.class) != null) {
+							return false;
+						} else if (f.getAnnotation(SkipIt.class) != null) {
+							return true;
+						}
 
 				else {
-					return false;
-				}
-			}
+							return false;
+						}
+					}
 
-			@Override
-			public boolean shouldSkipClass(Class<?> arg0) {
-				// TODO Auto-generated method stub
-				return false;
-			}
-		}).create();
+					@Override
+					public boolean shouldSkipClass(Class<?> arg0) {
+						// TODO Auto-generated method stub
+						return false;
+					}
+				}).create();
 
 		return gson;
 	}
 
-	public static  <T> ResponseModel<T>  getResponseObject(Status status, T t , String message) {
-		
-		ResponseModel<T> responseModel = new ResponseModel<T>(status, t, message);
-		
-		return responseModel;
-	}
 	
-	public static  <T> String  getResponse(Status status, T t , String message) {
-		ResponseModel<T> responseModel = new ResponseModel<T>(status, t, message);
-		
-		return getGsonObject().toJson(responseModel);
-	}
-	
-	/*public static  <T> String  getResponse(Status status, T t , String message, Integer currentUserId) {
-		ResponseModel<T> responseModel = new ResponseModel<T>(status, t, message);
-		responseModel.currentUserId = currentUserId;
-		
-		return getGsonObject().toJson(responseModel);
+
+	/*public enum Status {
+		SUCCESS, FAIL, UNAUTHORIZE, FB_UNAUTHORIZE
 	}*/
 	
 	
-	
-	public static  <T> String  getResponse(Status status, String message) {
+	private class Model<T>{
 		
-		return getResponse(status, null, message);
+		private Status status;
+
+		private T data;
+
+		private String message;
+
+		private Integer currentUserId;
+		
+		Model(Status status, T data, String message, Integer currentUserId) {
+			
+			this.status = status;
+			this.data = data;
+			this.message = message;
+			this.currentUserId = currentUserId;
+
+		}
+		
+		
+
+		public Status getStatus() {
+			return status;
+		}
+
+		public T getData() {
+			return data;
+		}
+
+		public String getMessage() {
+			return message;
+		}
+
+		public Integer getCurrentUserId() {
+			return currentUserId;
+		}
+
+		public void setCurrentUserId(Integer currentUserId) {
+			this.currentUserId = currentUserId;
+		}
+		
 		
 	}
 	
 	public enum Status {
-		SUCCESS, FAIL, UNAUTHORIZE, FB_UNAUTHORIZE
+		SUCCESS, FAIL, UNAUTHORIZE, REDIRECT, PHONE_OTP, TRADE_COMPLETE
 	}
-	
-	@Target({ElementType.FIELD, ElementType.METHOD})
+
+	@Target({ ElementType.FIELD, ElementType.METHOD })
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface SkipIt {
 
 	}
-	
-	@Target({ElementType.FIELD, ElementType.METHOD})
+
+	@Target({ ElementType.FIELD, ElementType.METHOD })
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface FcmGet {
 
 	}
-	
-	@Target({ElementType.FIELD, ElementType.METHOD})
+
+	@Target({ ElementType.FIELD, ElementType.METHOD })
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface GetIt {
-
+		public String[] skipValues() default "";
 	}
-	
-	@Target({ElementType.FIELD, ElementType.METHOD})
+
+	@Target({ ElementType.FIELD, ElementType.METHOD })
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface UserInfoGet {
 
 	}
-	
-	@Target({ElementType.FIELD, ElementType.METHOD})
+
+	@Target({ ElementType.FIELD, ElementType.METHOD })
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface AdminSkip {
 
 	}
-	
-	@Target({ElementType.FIELD, ElementType.METHOD})
+
+	@Target({ ElementType.FIELD, ElementType.METHOD })
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface AdminGet {
 
 	}
+	
+	public enum Roles{
+		ROLE_USER, ROLE_ADMIN, ROLE_SUBADMIN ,ROLE_ANONYMOUS
+	}
+
+	
 }
