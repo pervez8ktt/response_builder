@@ -13,7 +13,7 @@ import com.google.gson.GsonBuilder;
 
 public class ResponseModel {
 
-	
+	private ResponseModel() {}
 
 	public static <T> String getResponse(Status status, T t, ResponseMessage message, Integer currentUserId) {
 
