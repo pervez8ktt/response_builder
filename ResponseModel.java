@@ -89,11 +89,25 @@ public class ResponseModel {
 		Gson gson = new GsonBuilder().registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY).serializeNulls()
 				.disableHtmlEscaping().addSerializationExclusionStrategy(new ExclusionStrategy() {
 
+					List<String> skipFields = new ArrayList<String>();
+			
 					@Override
 					public boolean shouldSkipField(FieldAttributes f) {
 						//
-
+						
+						String fieldName = f.getDeclaringClass().getName()+"."+f.getName();
+						
+						if(skipFields.contains(fieldName)) {
+							return true;
+						}
+						
 						if (f.getAnnotation(GetIt.class) != null) {
+							
+							GetIt getIt = f.getAnnotation(GetIt.class);
+							for(String v : getIt.skipValues()) {
+								skipFields.add(v);
+							}
+							
 							return false;
 						} else if (f.getAnnotation(OneToMany.class) != null) {
 							return true;
